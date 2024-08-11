@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: dpr-sonar
+Version: 0.0.0
+Requires-Dist: faiss-cpu>=1.6.1
+Requires-Dist: filelock
+Requires-Dist: numpy
+Requires-Dist: regex
+Requires-Dist: torch>=1.5.0
+Requires-Dist: transformers>=4.3
+Requires-Dist: tqdm>=4.27
+Requires-Dist: wget
+Requires-Dist: spacy>=2.1.8
+Requires-Dist: hydra-core>=1.0.0
+Requires-Dist: omegaconf>=2.0.1
+Requires-Dist: jsonlines
+Requires-Dist: soundfile
+Requires-Dist: editdistance
