@@ -184,15 +184,25 @@ def _main(cfg: DictConfig, output_file):
     num_sentences = 0
     has_target = True
     wps_meter = TimeMeter()
+    
     for sample in progress:
+        
         sample = utils.move_to_cuda(sample) if use_cuda else sample
         if "net_input" not in sample:
             continue
 
         prefix_tokens = None
         if cfg.generation.prefix_size > 0:
-            prefix_tokens = sample["target"][:, : cfg.generation.prefix_size]
-
+            for i,x in enumerate(sample["target"]):
+                prefix_size=(x == 4).nonzero(as_tuple=True)[0] #ST
+                #print(prefix_size)
+            if prefix_size.numel()==0:
+                prefix_size=0
+                prefix_tokens=None
+            else:
+                prefix_size=prefix_size.item()+1
+                prefix_tokens=sample["target"][:,:prefix_size]
+            
         constraints = None
         if "constraints" in sample:
             constraints = sample["constraints"]
@@ -205,10 +215,12 @@ def _main(cfg: DictConfig, output_file):
             prefix_tokens=prefix_tokens,
             constraints=constraints,
         )
+        #print("hypos is {}".format(hypos))
         num_generated_tokens = sum(len(h[0]["tokens"]) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
         for i, sample_id in enumerate(sample["id"].tolist()):
+            
             has_target = sample["target"] is not None
 
             # Remove padding
@@ -230,9 +242,11 @@ def _main(cfg: DictConfig, output_file):
                 src_str = task.dataset(cfg.dataset.gen_subset).src.get_original_text(
                     sample_id
                 )
+                #print("src_str is {}".format(src_str))
                 target_str = task.dataset(cfg.dataset.gen_subset).tgt.get_original_text(
                     sample_id
                 )
+                #print("target_str is {}".format(target_str))
             else:
                 if src_dict is not None:
                     src_str = src_dict.string(src_tokens, cfg.common_eval.post_process)
@@ -240,7 +254,7 @@ def _main(cfg: DictConfig, output_file):
                     src_str = ""
                 if has_target:
                     target_str = tgt_dict.string(
-                        target_tokens,
+                        target_tokens, #!!!![cfg.generation.prefix_size :]
                         cfg.common_eval.post_process,
                         escape_unk=True,
                         extra_symbols_to_ignore=get_symbols_to_strip_from_output(
@@ -249,9 +263,10 @@ def _main(cfg: DictConfig, output_file):
                     )
 
             src_str = decode_fn(src_str)
+            #print("decoded_src_str is {}".format(src_str))
             if has_target:
                 target_str = decode_fn(target_str)
-
+                
             if not cfg.common_eval.quiet:
                 if src_dict is not None:
                     print("S-{}\t{}".format(sample_id, src_str), file=output_file)
@@ -261,7 +276,7 @@ def _main(cfg: DictConfig, output_file):
             # Process top predictions
             for j, hypo in enumerate(hypos[i][: cfg.generation.nbest]):
                 hypo_tokens, hypo_str, alignment = utils.post_process_prediction(
-                    hypo_tokens=hypo["tokens"].int().cpu(),
+                    hypo_tokens=hypo["tokens"].int().cpu(), #!!!!![cfg.generation.prefix_size:]
                     src_str=src_str,
                     alignment=hypo["alignment"],
                     align_dict=align_dict,
@@ -269,7 +284,9 @@ def _main(cfg: DictConfig, output_file):
                     remove_bpe=cfg.common_eval.post_process,
                     extra_symbols_to_ignore=get_symbols_to_strip_from_output(generator),
                 )
+            
                 detok_hypo_str = decode_fn(hypo_str)
+                
                 if not cfg.common_eval.quiet:
                     score = hypo["score"] / math.log(2)  # convert to base 2
                     # original hypothesis (after tokenization and BPE)
@@ -357,8 +374,31 @@ def _main(cfg: DictConfig, output_file):
                             detok_hypo_str, add_if_not_exist=True
                         )
                     if hasattr(scorer, "add_string"):
-                        scorer.add_string(target_str, detok_hypo_str)
+                        target_tokens = tgt_dict.encode_line(
+                            target_str, add_if_not_exist=True
+                        )
+                        hypo_tokens = tgt_dict.encode_line(
+                            detok_hypo_str, add_if_not_exist=True
+                        )
+                        
+                        prefix_size_tgt=target_str.find(' <SEP> ')
+                        if prefix_size_tgt==-1:
+                            target_str_no_prefix=target_str
+                        else:
+                            target_str_no_prefix=target_str[prefix_size_tgt+7:]
+                        
+
+                        prefix_size_hypo=detok_hypo_str.find(' <SEP> ')
+                        if prefix_size_hypo==-1:
+                            hypo_str_no_prefix=detok_hypo_str
+                        else:
+                            hypo_str_no_prefix=detok_hypo_str[prefix_size_hypo+7:]
+                        print("T_no_prefix:{}".format(target_str_no_prefix))
+                        print("D_no_prefix:{}".format(hypo_str_no_prefix))
+                        scorer.add_string(target_str_no_prefix, hypo_str_no_prefix)
+                        #scorer.add_string(target_str, detok_hypo_str)
                     else:
+                        
                         scorer.add(target_tokens, hypo_tokens)
 
         wps_meter.update(num_generated_tokens)

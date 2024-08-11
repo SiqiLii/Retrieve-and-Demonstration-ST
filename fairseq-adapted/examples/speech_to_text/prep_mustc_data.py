@@ -12,7 +12,8 @@ import shutil
 from itertools import groupby
 from tempfile import NamedTemporaryFile
 from typing import Tuple
-
+import sys
+sys.path.append(os.path.dirname(os.getcwd()))
 import numpy as np
 import pandas as pd
 import soundfile as sf
@@ -47,8 +48,8 @@ class MUSTC(Dataset):
     utterance_id
     """
 
-    SPLITS = ["train", "dev", "tst-COMMON", "tst-HE"]
-    LANGUAGES = ["de", "es", "fr", "it", "nl", "pt", "ro", "ru"]
+    SPLITS = ["train", "dev", "tst-COMMON"]
+    LANGUAGES = ["de"]
 
     def __init__(self, root: str, lang: str, split: str) -> None:
         assert split in self.SPLITS and lang in self.LANGUAGES
@@ -190,7 +191,7 @@ def process(args):
                 Path(f.name),
                 cur_root / spm_filename_prefix,
                 args.vocab_type,
-                args.vocab_size,
+                args.vocab_size, special_symbols=['<SEP>'] #add special symbol for example and original sentence separator
             )
         # Generate config YAML
         if args.use_audio_input:

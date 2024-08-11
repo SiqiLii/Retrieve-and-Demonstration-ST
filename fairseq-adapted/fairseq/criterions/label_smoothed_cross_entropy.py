@@ -100,8 +100,14 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         target = model.get_targets(sample, net_output)
         if self.ignore_prefix_size > 0:
             # lprobs: B x T x C
-            lprobs = lprobs[:, self.ignore_prefix_size :, :].contiguous()
-            target = target[:, self.ignore_prefix_size :].contiguous()
+            target = target.clone()
+            for i, t in enumerate(target):
+                sep_idx = (t == 4).nonzero(as_tuple=True)[0]
+                if len(sep_idx) != 0:
+                    target[i, :sep_idx+1] = self.padding_idx
+                    sample["ntokens"] -= (sep_idx + 1)
+            #lprobs = lprobs[:, self.ignore_prefix_size :, :].contiguous()
+            #target = target[:, self.ignore_prefix_size :].contiguous()
         return lprobs.view(-1, lprobs.size(-1)), target.view(-1)
 
     def compute_loss(self, model, net_output, sample, reduce=True):
