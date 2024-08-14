@@ -50,7 +50,7 @@ Construct train_ex split that each sentence in the reduced-train split is prepen
 ```bash
 python preprocessing/datasets_gold_example_generation.py --dir ${MUSTC_ROOT} --train True
 ```
-Download our generated datasets if you want to use our pre-trained models:
+Download our generated datasets:
 - Reduced-Datasets: [Train](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link), [dev](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link), [rare-word-tst](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link),[rare-word-pool](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link)
 - Reduced-Datasets with gold example: [Train_ex](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link), [dev_ex](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link), [tst_ex](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link),[tst-COMMON_ex](https://drive.google.com/drive/folders/1mrR67koMGwbtrmyyzaGhUBzQvucARUFB?usp=drive_link)
 
