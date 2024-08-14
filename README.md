@@ -9,14 +9,32 @@ We are using english-to-german translation language pair of the [MuST-C](https:/
 `${MUSTC_ROOT}/en-de`
 
 ### Rare Word List Generation
-We first take the train-split to evaluate how many rare words are there and where do they appear
+We first take the train-split to evaluate how many rare words are there and where do they appear, write them to a rare word list at rareword_terminology.txt. Here's our generated [rare word list](https://ict.fbk.eu/rareword_terminology.txt)
 ```bash
-python preprocessing/rareword_analyze.py --dir ${MUSTC_ROOT/train/txt/train.en}
+python preprocessing/rareword_analyze.py ${MUSTC_ROOT}/train/txt/train.en
 ```
-Then align rare words with their german translation 
+Then align rare words with their german translation.
+First install [Awesomealign](https://github.com/neulab/awesome-align) 
 ```bash
-python preprocessing/rareword_alignment.py --dir_en ${MUSTC_ROOT/train/txt/train.en} --dir_de ${MUSTC_ROOT/train/txt/train.de}
+python preprocessing/awesomealign_data_generation.py ${MUSTC_ROOT}/train/txt/train.en  ${MUSTC_ROOT}/train/txt/train.de
+cd awesome-align
+
+DATA_FILE=train_ende.src-tgt
+MODEL_NAME_OR_PATH=bert-base-multilingual-cased
+OUTPUT_FILE=train_alignment.txt
+OUTPUT_WORD_FILE=train_alignment_word.txt
+    awesome-align \
+    --output_file=$OUTPUT_FILE \
+    --model_name_or_path=$MODEL_NAME_OR_PATH \
+    --data_file=$DATA_FILE \
+    --extraction 'softmax' \
+    --batch_size 32 \
+    --output_word_file=$OUTPUT_WORD_FILE
 ```
+```bash
+python preprocessing/rareword_alignment.py /path/to/rareword_terminology.txt /path/to/train_alignment_word.txt
+```
+Here we align rare english word with its german translation, at rareword_terminology_de.txt. Here's our generated rare word [translation](https://ict.fbk.eu/rareword_terminology_de.txt)
 ### Data Splits Generation
 We are using analyzed rare word information to construct reduced-train split, rare-word-tst split, rare-word-dev split, rare-word-pool: named train, tst, dev, terminology respectively
 ```bash
