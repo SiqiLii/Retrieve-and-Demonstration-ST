@@ -5,11 +5,11 @@ Enhancing Rare Word Translation Accuracy in direct Speech Translation via Retrie
 
 We are using english-to-german translation language pair of the [MuST-C](https://www.aclweb.org/anthology/N19-1202) dataset(v.2) for training and evaluation, which is a multilingual speech-to-text translation corpus on English TED talks.
 
-[Download](https://ict.fbk.eu/must-c) (en-de language pair) and unpack MuST-C data to a path
+Download MuST-C v2(en-de language pair) and unpack MuST-C data to a path
 `${MUSTC_ROOT}/en-de`
 
 ### Rare Word List Generation
-We first take the train-split to evaluate how many rare words are there and where do they appear, write them to a rare word list at rareword_terminology.txt. Here's our generated [rare word list](https://ict.fbk.eu/rareword_terminology.txt)
+We first take the train-split to evaluate how many rare words are there and where do they appear, write them to a rare word list at rareword_terminology.txt. Here's our generated [rare word list](https://drive.google.com/file/d/1WgL_KKi11o1_j3P8rGdmrD-wcioq4K-X/view?usp=drive_link)
 ```bash
 python preprocessing/rareword_analyze.py ${MUSTC_ROOT}/train/txt/train.en
 ```
@@ -34,7 +34,7 @@ OUTPUT_WORD_FILE=train_alignment_word.txt
 ```bash
 python preprocessing/rareword_alignment.py /path/to/rareword_terminology.txt /path/to/train_alignment_word.txt
 ```
-Here we align rare english word with its german translation, at rareword_terminology_de.txt. Here's our generated rare word [translation](https://ict.fbk.eu/rareword_terminology_de.txt)
+Here we align rare english word with its german translation, at rareword_terminology_de.txt. Here's our generated rare word [translation](https://drive.google.com/file/d/1_f7inMAoz_O_O9lq9E_g5XsUWdSFzHr3/view?usp=drive_link)
 ### Data Splits Generation
 We are using analyzed rare word information to construct reduced-train split, rare-word-tst split, rare-word-dev split, rare-word-pool: named train, tst, dev, terminology respectively
 ```bash
@@ -295,7 +295,7 @@ It contains pools of negative passages, positive passages per question, and some
   ...
 ]
 ```
-Our generated training data [data_train_audio_new_2.json](https://dl.fbaipublicfiles.com/fairseq/s2t/mustc_joint_asr_transformer_m.pt) and dev data [data_dev_audio.json](https://dl.fbaipublicfiles.com/fairseq/s2t/mustc_joint_asr_transformer_m.pt) is available here.
+Our generated training data [data_train_audio_new_2.json](https://drive.google.com/file/d/1AQ_9DoDjjEHjyEM1f7-ZSGA6nOjq919i/view?usp=drive_link) and dev data [data_dev_audio.json](https://drive.google.com/file/d/10W6CDXdGg787mwaIlzUR4ZQgniYOpMgK/view?usp=drive_link) is available here.
 
 ### Retriever training
 Retriever training quality depends on its effective batch size. We are setting batch size equals to 4.
