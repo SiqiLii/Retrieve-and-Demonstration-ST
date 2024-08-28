@@ -388,7 +388,7 @@ cat $hyp | sacrebleu $ref -m bleu chrf > $outname.bleu
 
 #### Results
 | Data | --modality  | BLEU(tst-COMMON) | COMET(tst-COMMON) | BLEU(tst) | COMET(tst) | Translation Accuracy(tst) |
-|---|---|---|---|---|
+|---|---|---|---|---|---|---|
 | en-de | text-to-text | 21.62 | 64 | 15.2 | 54.4 | 20.1%
 | en-de | speech-to-text | 21.35 | 64.1 | 15.3 | 54.0 | 18.8%
 | en-de | speech-to-speech | 21.82 | 64.9 | 16.2 | 55.3 | 20.3%
