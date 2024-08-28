@@ -8,7 +8,7 @@ nlp_de=spacy.load("de_core_news_sm") #de_dep_news_trf" "de_core_news_sm"
 
 def read_word_pairs(file_path):
     word_pairs = {}
-    with open('/home/sli/DPR/downloads/data/fairseq/nonrareword_list.txt', encoding='utf-8') as f:
+    with open('nonrareword_list.txt', encoding='utf-8') as f:
         data = f.read()
     list_non_rareword=json.loads(data)
     with open(file_path, 'r', encoding='utf-8') as file:

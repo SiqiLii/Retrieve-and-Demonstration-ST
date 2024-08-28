@@ -68,7 +68,7 @@ class SonarEncoderModel(nn.Module):
                         if ('encoder_frontend' in n):
                             print(f"Freezing {n}")
                             param.requires_grad = False
-                        elif len(name_parts) > 3 and name_parts[2].isdigit() and int(name_parts[2]) < 23: #audio <22 #text freeze_10 <11 freeze_15 <16
+                        elif len(name_parts) > 3 and name_parts[2].isdigit() and int(name_parts[2]) < 22: #audio <22 #text freeze_10 <11 freeze_15 <16
                             print(f"Freezing {n}")
                             param.requires_grad = False
                         else:
