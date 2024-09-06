@@ -34,10 +34,10 @@ For details on the dataset splitting, please see [here](preprocessing/README.md)
 
 Our datasets:
 - NOTE: before using the .tsv files, please replace the paths to the audio features to your local path
-- [Audio features](TODO:upload fbank.zip)
-- [TSV manifests]() for standard setup (train/dev/rare word test set)
-- [TSV manifests]() for setup with prepended **gold** examples(train/dev/rare word test set)
-- [TSV manifests]() for setup with prepended **retrieved** examples (train/dev/rare word test set)
+- [Audio features](TODO:upload fbank.zip) <-- we're looking for a platform to host very big files, to be uploaded soon  
+- [TSV manifests](https://bwsyncandshare.kit.edu/s/KSyieqFZpaGwT7W) for standard setup (train/dev/rare word test set)
+- [TSV manifests](https://bwsyncandshare.kit.edu/s/LJTDXAfqoDip8p9) for setup with prepended **gold** examples(train/dev/rare word test set)
+- [TSV manifests](https://bwsyncandshare.kit.edu/s/BQ4FHx9ja8RJJim) for setup with prepended **retrieved** examples (rare word test set with audio-audio/audio-text/text-text retrieval)
 
 ## Speech Translation
 
@@ -57,7 +57,7 @@ python $FAIRSEQ_DIR/examples/speech_to_text/prep_mustc_data.py \
 
 To prevent the tokenizer from seeing the rare words during its training,
 we create a different vocabulary from the fairseq example on the reduced train set after the utterances containing rare words are moved to dedicated splits.
-- [vocabulary files](TODO:)
+- [vocabulary files](https://bwsyncandshare.kit.edu/s/qcqz4N2nkpRZBQn)
 
 ## Training
 
@@ -151,7 +151,7 @@ cat $hyp | sacrebleu $ref -m bleu chrf > $outname.bleu
 </details>
 
 
-#### [Inference with Prepended Examples]
+#### Inference with Prepended Examples
 
 * We use `--ignore-prefix-size 1` as a flag to run forced decoding on the prepended example.
 * Our current implementation only supports batch size 1
@@ -196,10 +196,10 @@ python postprocessing/analyze.py path/to/inference/log path/to/rareword_terminol
 ```
 
 #### Results
-| Data | Arch  | BLEU(tst) | COMET(tst) | Translation Accuracy(tst) | Model |
-|---|---|---|---|---|---|
-| en-de | s2t_transformer_s | 17.2 | 57.9 | 11.8% | [Download](TODO)|
-| en-de | s2t_transformer_s(adapted) | 17.0 | 55.6 | 29.4% | [Download](TODO)|
+| Model | BLEU (tst) | COMET (tst) | Rare Word Accuracy (tst) | Model |
+|---|------------|-------------|--------------------------|---|
+| baseline                   | 17.2       | 57.9        | 11.8%                    | [Download](https://bwsyncandshare.kit.edu/s/3SwMCkPqePDazqs)|
+| adapted to ingest example | 17.0       | 55.6        | 29.4%                    | [Download](https://bwsyncandshare.kit.edu/s/r4s236eZ3ntM7t2)|
 
 ## Retriever 
 
@@ -209,36 +209,28 @@ First, prepare data for our retriever training.
 ```bash
 python DPR_SONAR/data_formatting.py /path/to/rareword_terminology /path/to/train_en /path/to/dev_ex_en_path
 ```
-The default data format of the Retriever training data is JSON.
-It contains pools of negative passages, positive passages per question, and some additional information. 
-Positive passages are sentences containing the same rare word, and negative passages are sentences not sharing rare words.
+Like with [DPR](https://github.com/facebookresearch/DPR?tab=readme-ov-file#retriever-input-data-format),
+the default training data format is JSON.
+It contains:
+* pools of negative passages
+* positive passages per question
+* additional information 
 
-```
-[
-  {
-	"question": "....",
-	"answers": ["...", "...", "..."],
-	"positive_ctxs": [{
-		"title": "...",
-		"text": "...."
-	}],
-	"negative_ctxs": ["..."],
-	"hard_negative_ctxs": ["..."]
-  },
-  ...
-]
-```
+Here positive passages are sentences containing the same rare word, 
+and negative passages are sentences not sharing rare words.
+
 Our generated [training data](https://drive.google.com/file/d/1AQ_9DoDjjEHjyEM1f7-ZSGA6nOjq919i/view?usp=drive_link) and [dev data](https://drive.google.com/file/d/10W6CDXdGg787mwaIlzUR4ZQgniYOpMgK/view?usp=drive_link).
 
-### Retriever Training
-The trained retriever quality depends on its effective batch size. 
-We set the batch size to 4.
-Edit `init_encoder` function of `DPR_SONAR/src/dpr_sonar/models/sonar_model.py` to freeze different numbers of layers of SONAR encoder.
+### Retriever Training 
+We use batch size 4.
+
+To freeze different numbers of layers of SONAR encoder,
+edit `init_encoder` function of `DPR_SONAR/src/dpr_sonar/models/sonar_model.py`.
 
 ```bash
 python train_dense_encoder_SONAR.py \
-train_datasets=["/path/to/data_train_audio_new_2.json"] \
-dev_datasets=["/path/to/data_dev_audio.json"] \
+train_datasets=["/path/to/training/data.json"] \
+dev_datasets=["/path/to/dev/data.json"] \
 train=biencoder_default \
 output_dir=${path to checkpoints dir}
 ```
