@@ -19,7 +19,7 @@ cd awesome-align
 DATA_FILE=train_ende.src-tgt
 MODEL_NAME_OR_PATH=bert-base-multilingual-cased
 OUTPUT_FILE=train_alignment.txt
-OUTPUT_WORD_FILE=train_alignment_word.txt
+OUTPUT_WORD_FILE=train_alignment_word.txt 
     awesome-align \
     --output_file=$OUTPUT_FILE \
     --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -37,11 +37,11 @@ We are using analyzed rare word information to construct reduced-train split, ra
 ```bash
 python preprocessing/datasets_generation.py ${MUSTC_ROOT} /path/to/rareword_terminology /path/to/rareword_terminology_de /path/to/train_en
 
-python preprocessing/datasets_no_example_generation.py 
-    --path_origin_yaml $YAML_FILE_PATH_TO_ORIGINAL_TRAIN_SET \
-    --path_origin_en $EN_FILE_PATH_TO_ORIGINAL_TRAIN_SET \
-    --path_origin_de  $DE_FILE_PATH_TO_ORIGINAL_TRAIN_SET \
-    --root_path_origin $DIR_PATH_TO_ORIGINAL_TRAIN_SET \
+python preprocessing/datasets_no_example_generation.py \
+    --path_origin_yaml=$YAML_FILE_PATH_TO_ORIGINAL_TRAIN_SET \
+    --path_origin_en=$EN_FILE_PATH_TO_ORIGINAL_TRAIN_SET \
+    --path_origin_de=$DE_FILE_PATH_TO_ORIGINAL_TRAIN_SET \
+    --root_path_origin=$DIR_PATH_TO_ORIGINAL_TRAIN_SET \
     --new_root_path  \
     --name \
     --file_path_index_list  \

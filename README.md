@@ -247,22 +247,39 @@ We evaluate the retriever on retrieving example sentences from the rare-word poo
 
 ```bash
 python DPR_SONAR/retrieve.py \
-  /path/to/tst_en /path/to/train_en \
-  /path/to/term_en /path/to/term_wav_dir \
-  /path/to/tst_wav_dir /path/to/retreiver_model_checkpoint \
-  /path/to/rareword_terminology query_type ctx_type 
+  tst_en_file=${MUSTC_ROOT}/en-de/data/tst/txt/tst.en \
+  term_en_file=${MUSTC_ROOT}/en-de/data/terminology/txt/terminology.en \
+  term_wav_dir=${MUSTC_ROOT}/en-de/data/terminology/wav \
+  tst_wav_dir=${MUSTC_ROOT}/en-de/data/tst/wav \
+  model_file=${path to checkpoints dir}/retreiver_model_checkpoint \
+  rareword_dict_path=/path/to/rareword_terminology \
+  query_type=query_type \
+  ctx_type=ctx_type 
 ```
+a file named tst_term_pairs_dpr_sonar_finetune_q_n_p_{query_type}_{ctx_type}_text_10.txt will be generated storing top10 indices of retrieved sentence
+
+* For speech-to-speech retrieval: query_type:`audio`, ctx_type:`audio`
+* For speech-to-text retrieval: query_type:`audio`, ctx_type:`text`
+* For text-to-text retrieval: query_type:`text`, ctx_type:`text`
 
 ## Evaluate ST on Retrieved Data
 
 ### Prepend retrieved example to tst split (rare word test set)
 ```bash
-python data_generation_retriever.py \
-	model_file={path to a checkpoint downloaded from our download_data.py as 'checkpoint.retriever.single.nq.bert-base-encoder'} \
-	qa_dataset={the name os the test source} \
-	ctx_datatsets=[{list of passage sources's names, comma separated without spaces}] \
-	encoded_ctx_files=[{list of encoded document files glob expression, comma separated without spaces}] \
-	out_file={path to output json file with results} 
+for p_new in tst_audio_audio tst_text_audio tst_text_text; do
+p=${p_new%"tst_"}
+python preprocessing/data_generation_retriever.py \
+	--root_path_example=${MUSTC_ROOT}/en-de/data/terminology \
+  --path_example_yaml=${MUSTC_ROOT}/en-de/data/terminology/txt/terminology.yaml \
+  --path_example_en=${MUSTC_ROOT}/en-de/data/terminology/txt/terminology.en \
+  --path_example_de=${MUSTC_ROOT}/en-de/data/terminology/txt/terminology.de  \
+  --path_origin_yaml=${MUSTC_ROOT}/en-de/data/tst/txt/tst.yaml \
+  --path_origin_en=${MUSTC_ROOT}/en-de/data/tst/txt/tst.en \
+  --path_origin_de=${MUSTC_ROOT}/en-de/data/tst/txt/tst.de  \
+  --root_path_origin=${MUSTC_ROOT}/en-de/data/tst  \
+  --new_root_path=${MUSTC_ROOT}/en-de/data/tst/$p_new/  \
+  --name=$p_new \
+  --file_path_index_pair=DPR_SONAR/tst_term_pairs_dpr_sonar_finetune_q_n_p_$p.txt
 ```
 
 ### Data Preparation

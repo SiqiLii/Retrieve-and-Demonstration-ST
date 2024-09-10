@@ -1,6 +1,7 @@
 import os
 import torch
 import numpy
+import argparse
 from dpr_sonar.data.biencoder_data_SONAR import BiEncoderPassage
 from dpr_sonar.models import init_biencoder_components
 from dpr_sonar.options import set_cfg_params_from_state, setup_cfg_gpu, setup_logger
@@ -43,19 +44,13 @@ def get_audio_path(directory_path):
 
     return audios_path_list
 
-def main(tst_en_path, train_en_path, term_en_path, term_wav_dir, tst_wav_dir, model_file,rareword_dict_path):
+def main(tst_en_path, term_en_path, term_wav_dir, tst_wav_dir, model_file,rareword_dict_path,query_type,ctx_type):
     # Read the text files
     with open(tst_en_path) as f:
-        tst_lines_new = f.readlines()
-    with open(train_en_path) as f:
-        train_lines = f.readlines()
+        lines_tst_origin = f.readlines()
     with open(term_en_path) as f:
         term_lines = f.readlines()
 
-
-
-    lines_tst_origin=[line.split(' <SEP> ')[1] for line in tst_lines_new]
-    lines_tst_example=[line.split(' <SEP> ')[0] for line in tst_lines_new]
 
     # Path to the directory containing the .wav files
     term_audio_files=get_audio_path(term_wav_dir)
@@ -193,20 +188,20 @@ def main(tst_en_path, train_en_path, term_en_path, term_wav_dir, tst_wav_dir, mo
     for i in range(len(top_10_indices_list)):
         tst_term_pairs.append([i,top_10_indices_list[i],top_10_vals_list[i]])
     
-    with open('tst_term_pairs_dpr_sonar_finetune_q_n_p_audio_text_10.txt','w') as f:
+    with open('tst_term_pairs_dpr_sonar_finetune_q_n_p_{}_{}.txt'.format(query_type,ctx_type),'w') as f:
             for item in tst_term_pairs:
                 f.write('{} \n'.format(item))
 
     for i,pair in enumerate(tst_term_pairs):
         if i==0:
-            with open('retrieved_example_dpr_sonar_finetune_q_n_p_audio_text_1st_NN_3.txt','w') as g: #
+            with open('retrieved_example_dpr_sonar_finetune_q_n_p_{}_{}_1st_NN_3.txt'.format(query_type,ctx_type),'w') as g: #
                 g.write(term_lines[pair[1][0]].strip()+' <SEP> '+lines_tst_origin[pair[0]])
       
         else:
-            with open('retrieved_example_dpr_sonar_finetune_q_n_p_audio_text_1st_NN_3.txt','a') as g: #
+            with open('retrieved_example_dpr_sonar_finetune_q_n_p_{}_{}_1st_NN_3.txt'.format(query_type,ctx_type),'a') as g: #
                 g.write(term_lines[pair[1][0]].strip()+' <SEP> '+lines_tst_origin[pair[0]])
     print("saved txt files")
-    with open('retrieved_example_dpr_sonar_finetune_q_n_p_audio_text_1st_NN_3.txt',encoding='utf-8') as f:
+    with open('retrieved_example_dpr_sonar_finetune_q_n_p_{}_{}_1st_NN_3.txt'.format(query_type,ctx_type),encoding='utf-8') as f:
         lines = f.readlines()
     
     with open(rareword_dict_path) as f:
@@ -253,14 +248,14 @@ def main(tst_en_path, train_en_path, term_en_path, term_wav_dir, tst_wav_dir, mo
     total_rarewords=[]
     for k,v in sentence_rarewords.items():
         total_rarewords=total_rarewords+v
-        total_rarewords_set=set(total_rarewords)
-        total_rarewords=list(total_rarewords)
+    total_rarewords_set=set(total_rarewords)
+    total_rarewords=list(total_rarewords)
     
-        total_example_rarewords=[]
-        for k,v in example_rarewords.items():
-            total_example_rarewords=total_example_rarewords+v
-        total_example_rarewords_set=set(total_example_rarewords)
-        total_example_rarewords=list(total_example_rarewords)
+    total_example_rarewords=[]
+    for k,v in example_rarewords.items():
+        total_example_rarewords=total_example_rarewords+v
+    total_example_rarewords_set=set(total_example_rarewords)
+    total_example_rarewords=list(total_example_rarewords)
     
     print("num of rare words is {}".format(len(total_rarewords))) #num of unrecognized lemma
     print("num of rare words in example is {}".format(len(total_example_rarewords))) #num of recognized word
@@ -268,22 +263,33 @@ def main(tst_en_path, train_en_path, term_en_path, term_wav_dir, tst_wav_dir, mo
 
 if __name__ == "__main__":
     
-    if len(sys.argv) != 10:
+    if len(sys.argv) != 9:
         print("Usage: python script_name.py <english_file> <german_file>")
         sys.exit(1)
-    tst_en_path = sys.argv[1]
-    train_en_path = sys.argv[2]
-    term_en_path = sys.argv[3]
-    term_wav_dir = sys.argv[4]
-    tst_wav_dir = sys.argv[5]
-    model_file = sys.argv[6]
-    rareword_dict_path = sys.argv[7]
-    query_type = sys.argv[8]
-    ctx_type = sys.argv[9]
-    
-    main(tst_en_path, train_en_path, term_en_path, term_wav_dir, tst_wav_dir, model_file, rareword_dict_path,query_type,ctx_type)
+    parser = argparse.ArgumentParser(description="Process audio and text files to create new dataset splits.")
+    parser.add_argument("--tst_en_file", type=str, required=True, help="Path to the file of the transcript of query data.")
+    parser.add_argument("--term_en_file", type=str, required=True, help="Path to the file of the transcript of passage data to retrieve from.")
+    parser.add_argument("--term_wav_dir", type=str, required=True, help="Path to the directory of the wav file of passage data to retrieve from.")
+    parser.add_argument("--tst_wav_dir", type=str, required=True, help="Path to the directory of the wav file of query data.")
+    parser.add_argument("--model_file", type=str, required=True, help="Path to the trained retriever model.")
+    parser.add_argument("--rareword_dict_path", type=str, required=True, help="Path to the rare word dictionary.")
+    parser.add_argument("--query_type", type=str, required=True, help="type of query, could be audio or text.")
+    parser.add_argument("--ctx_type", type=str, required=True, help="type of ctx passage, could be audio or text.")
 
+    args = parser.parse_args()
 
+    main(tst_en_path=args.tst_en_file, 
+                  term_en_path=args.term_en_file, 
+                  term_wav_dir=args.term_wav_dir, 
+                  tst_wav_dir=args.tst_wav_dir,
+                  model_file=args.model_file, 
+                  rareword_dict_path= args.rareword_dict_path,
+                  query_type=args.query_type,
+                  ctx_type=args.ctx_type,
+                  
+    )
+
+  
 
 
 
