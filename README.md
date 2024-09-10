@@ -256,7 +256,10 @@ python DPR_SONAR/retrieve.py \
   query_type=query_type \
   ctx_type=ctx_type 
 ```
-a file named tst_term_pairs_dpr_sonar_finetune_q_n_p_{query_type}_{ctx_type}_text_10.txt will be generated storing top10 indices of retrieved sentence
+
+The tst split is the rare-word-tst split and the terminology split is the rare-word-pool split mentioned in our paper. The details on the dataset splitting, please see [here](https://github.com/SiqiLii/Retrieve-and-Demonstration-ST/tree/main?tab=readme-ov-file#data-preparation). 
+
+After running, a file named tst_term_pairs_dpr_sonar_finetune_q_n_p_{query_type}_{ctx_type}_text_10.txt will be generated storing top10 indices of retrieved sentence, which will later be used to generate retrieved example prepended datasets.
 
 * For speech-to-speech retrieval: query_type:`audio`, ctx_type:`audio`
 * For speech-to-text retrieval: query_type:`audio`, ctx_type:`text`
