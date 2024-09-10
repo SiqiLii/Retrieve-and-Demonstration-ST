@@ -266,7 +266,7 @@ a file named tst_term_pairs_dpr_sonar_finetune_q_n_p_{query_type}_{ctx_type}_tex
 
 ### Prepend retrieved example to tst split (rare word test set)
 ```bash
-for p_new in tst_audio_audio tst_text_audio tst_text_text; do
+for p_new in tst_audio_audio tst_audio_text tst_text_text; do
 p=${p_new%"tst_"}
 python preprocessing/data_generation_retriever.py \
 	--root_path_example=${MUSTC_ROOT}/en-de/data/terminology \
