@@ -1,7 +1,7 @@
 # Retrieve-and-Demonstration-ST
 
 This repo contains code for the paper 	
-[Optimizing Terminology Accuracy in Speech Translation with a Retrieval-and-Demonstration Approach](TODO:add arxiv link).
+[Optimizing Terminology Accuracy in Speech Translation with a Retrieval-and-Demonstration Approach](https://arxiv.org/abs/).
 
 ## Setup
 
@@ -34,7 +34,7 @@ For details on the dataset splitting, please see [here](preprocessing/README.md)
 
 Our datasets:
 - NOTE: before using the .tsv files, please replace the paths to the audio features to your local path
-- [Audio features](TODO:upload fbank.zip) <-- we're looking for a platform to host very big files, to be uploaded soon  
+- [Audio features](fbank.zip) <-- *we're looking for a platform to host very big files, to be uploaded soon*
 - [TSV manifests](https://bwsyncandshare.kit.edu/s/KSyieqFZpaGwT7W) for standard setup (train/dev/rare word test set)
 - [TSV manifests](https://bwsyncandshare.kit.edu/s/LJTDXAfqoDip8p9) for setup with prepended **gold** examples(train/dev/rare word test set)
 - [TSV manifests](https://bwsyncandshare.kit.edu/s/BQ4FHx9ja8RJJim) for setup with prepended **retrieved** examples (rare word test set with audio-audio/audio-text/text-text retrieval)
@@ -245,6 +245,9 @@ Set `question_input_type` and `ctx_input_type` as `audio` or `text` in `DPR_SONA
 
 We evaluate the retriever on retrieving example sentences from the rare-word pool from the rare-word tst split.
 
+<details>
+<summary><b> Script </b></summary>
+	
 ```bash
 python DPR_SONAR/retrieve.py \
   tst_en_file=${MUSTC_ROOT}/en-de/data/tst/txt/tst.en \
@@ -256,6 +259,7 @@ python DPR_SONAR/retrieve.py \
   query_type=query_type \
   ctx_type=ctx_type 
 ```
+</details>
 
 The tst split is the rare-word-tst split and the terminology split is the rare-word-pool split mentioned in our paper. The details on the dataset splitting, please see [here](https://github.com/SiqiLii/Retrieve-and-Demonstration-ST/tree/main?tab=readme-ov-file#data-preparation). 
 
@@ -267,7 +271,11 @@ After running, a file named tst_term_pairs_dpr_sonar_finetune_q_n_p_{query_type}
 
 ## Evaluate ST on Retrieved Data
 
-### Prepend retrieved example to tst split (rare word test set)
+### Prepend retrieved examples to tst split (rare word test set)
+
+<details>
+<summary><b> Script </b></summary>
+	
 ```bash
 for p_new in tst_audio_audio tst_audio_text tst_text_text; do
 p=${p_new%"tst_"}
@@ -284,6 +292,7 @@ python preprocessing/data_generation_retriever.py \
   --name=$p_new \
   --file_path_index_pair=DPR_SONAR/tst_term_pairs_dpr_sonar_finetune_q_n_p_$p.txt
 ```
+</details>
 
 ### Data Preparation
 To generate new tsv files for ST inference, see section "Preprocessing" under "Speech Translation"
