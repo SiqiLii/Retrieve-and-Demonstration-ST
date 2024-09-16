@@ -1,7 +1,7 @@
 # Retrieve-and-Demonstration-ST
 
 This repo contains code for the paper 	
-[Optimizing Terminology Accuracy in Speech Translation with a Retrieval-and-Demonstration Approach](https://arxiv.org/abs/).
+[Optimizing Terminology Accuracy in Speech Translation with a Retrieval-and-Demonstration Approach](https://arxiv.org/abs/2409.09009).
 
 ## Setup
 
