@@ -34,7 +34,7 @@ For details on the dataset splitting, please see [here](preprocessing/README.md)
 
 Our datasets:
 - NOTE: before using the .tsv files, please replace the paths to the audio features to your local path
-- [Audio features](fbank.zip) <-- *we're looking for a platform to host very big files, to be uploaded soon*
+- ~~[Audio features](fbank.zip)~~ *(Due to new restrictions from TED licenses, we cannot share the MuST-C audio features.)*
 - [TSV manifests](https://bwsyncandshare.kit.edu/s/KSyieqFZpaGwT7W) for standard setup (train/dev/rare word test set)
 - [TSV manifests](https://bwsyncandshare.kit.edu/s/LJTDXAfqoDip8p9) for setup with prepended **gold** examples(train/dev/rare word test set)
 - [TSV manifests](https://bwsyncandshare.kit.edu/s/BQ4FHx9ja8RJJim) for setup with prepended **retrieved** examples (rare word test set with audio-audio/audio-text/text-text retrieval)
